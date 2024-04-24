@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    public float BulletForce = 20f;
     public float speed = 5f;
     float moveHorizontal = 0;
     float moveVertical = 0;
@@ -12,6 +13,8 @@ public class Player : NetworkBehaviour
     bool isGrounded = true;
     bool onLever;
     Rigidbody _rb;
+    [SerializeField] GameObject BulletPrefab;
+    public Transform PlayerTransf;
 
     [SerializeField] Animator floorPlayerOneAnim;
 
@@ -23,6 +26,8 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
+            
+        
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (isGrounded)
@@ -95,6 +100,12 @@ public class Player : NetworkBehaviour
                 isGrounded = false;
                 Jump();
             }
+        }
+        if (Input.GetMouseButtonDown(0)) 
+        {
+            GameObject Bullet = Instantiate(BulletPrefab, PlayerTransf.position, PlayerTransf.rotation);
+            Rigidbody _rb = Bullet.GetComponent<Rigidbody>();
+            _rb.AddForce(PlayerTransf.forward * BulletForce, ForceMode.Impulse); 
         }
     }
 
