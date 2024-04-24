@@ -10,7 +10,10 @@ public class Player : NetworkBehaviour
     float moveVertical = 0;
     float jumpForce = 5;
     bool isGrounded = true;
+    bool onLever;
     Rigidbody _rb;
+
+    [SerializeField] Animator floorPlayerOneAnim;
 
     /*private void FixedUpdate()
     {
@@ -31,18 +34,46 @@ public class Player : NetworkBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Lever")
+        {
+            onLever = true;
+            Debug.Log("Entro a palanca");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Lever")
+        {
+            onLever = false;
+            Debug.Log("Salio de palanca");
+        }
+    }
+
     public override void Spawned() //Se ejecuta siempre que el objeto es instanciado en todos los clientes, preguntar si tengo autoridad
     {
         //base.Spawned();
         if (!HasStateAuthority) return;
         _rb = GetComponent<Rigidbody>();
-
     }
 
     public override void FixedUpdateNetwork()
     {
         moveVertical = 0f;
         moveHorizontal = Input.GetAxis("Horizontal");
+
+        if (onLever)
+        {
+            if (Input.GetKey(KeyCode.E))
+            {
+                floorPlayerOneAnim.SetBool("PlayerOneActivatedLever", true);
+
+                if (floorPlayerOneAnim.GetBool("PlayerOneActivatedLever"))
+                    floorPlayerOneAnim.SetBool("PlayerOneActivatedLever", false);
+            }
+        }
 
         if (Input.GetKey(KeyCode.D))
         {
