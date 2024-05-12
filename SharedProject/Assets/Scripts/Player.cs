@@ -9,8 +9,11 @@ public class Player : NetworkBehaviour
     public float speed = 5f;
     float moveHorizontal = 0;
     float moveVertical = 0;
-    float jumpForce = 5;
-    bool isGrounded = true;
+    public float jumpForce = 5;
+    public bool isGrounded = true;
+    public float crouchSpeed;
+    private float startYScale;
+    public float crouchYScale;
     bool onLever;
     Rigidbody _rb;
     [SerializeField] GameObject BulletPrefab;
@@ -18,33 +21,22 @@ public class Player : NetworkBehaviour
 
     [SerializeField] Animator floorPlayerOneAnim;
 
-    /*private void FixedUpdate()
+    private void Start()
     {
-        moveHorizontal = 0f;
-        moveVertical = Input.GetAxis("Vertical");
-    }*/
-
-    void Update()
-    {
-            
-        
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (isGrounded)
-            {
-                Debug.Log("Salta");
-                isGrounded = false;
-                Jump();
-            }
-        }
+        startYScale = transform.localScale.y;
+        crouchYScale = startYScale / 2;
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Lever")
         {
             onLever = true;
             Debug.Log("Entro a palanca");
+        }
+
+        if (other.gameObject.tag == "Ground")
+        {
+            isGrounded = true;
         }
     }
 
@@ -59,7 +51,6 @@ public class Player : NetworkBehaviour
 
     public override void Spawned() //Se ejecuta siempre que el objeto es instanciado en todos los clientes, preguntar si tengo autoridad
     {
-        //base.Spawned();
         if (!HasStateAuthority) return;
         _rb = GetComponent<Rigidbody>();
     }
@@ -82,22 +73,32 @@ public class Player : NetworkBehaviour
 
         if (Input.GetKey(KeyCode.D))
         {
-            moveVertical = 1f;
+            moveHorizontal = 1f;
         }
         else if (Input.GetKey(KeyCode.A))
         {
-            moveVertical = -1f;
+            moveHorizontal = -1f;
         }
 
         Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
 
         _rb.MovePosition(transform.position + movement * speed * Runner.DeltaTime);
+        transform.forward = movement;
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+        }
+
+        if (Input.GetKeyUp(KeyCode.C))
+        {
+            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (isGrounded)
             {
-                isGrounded = false;
                 Jump();
             }
         }
@@ -111,6 +112,8 @@ public class Player : NetworkBehaviour
 
     public void Jump()
     {
+        Debug.Log("Salta");
         _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        isGrounded = false;
     }
 }
