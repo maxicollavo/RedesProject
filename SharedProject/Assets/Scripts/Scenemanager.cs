@@ -24,11 +24,11 @@ public class Scenemanager : MonoBehaviour
     }
     public void StartMenu()
     {
-        if (PlayerSpawner.Instance.currentPlayers == 2)
+        /*if (PlayerSpawner.Instance.currentPlayers == 2)
         {
             EventManager.Instance.Dispatch(GameEventTypes.ReadyToStart, this, EventArgs.Empty);
         }
-        else Debug.Log("No hay 2 players");
+        else Debug.Log("No hay 2 players");*/
     }
     public void ExitGame()
     {
